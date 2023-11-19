@@ -9,8 +9,9 @@ import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'dart:convert';
+import 'drawer.dart';
+import 'creator.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,9 +20,14 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Translation App',
-      home: TranslationPage(),
+      home: const TranslationPage(),
+      initialRoute: '/',
+      routes: {
+        '/drawer': (context) => const Details(),
+        '/Creator': (context) => const Creator(),
+      },
     );
   }
 }
@@ -34,6 +40,7 @@ class TranslationPage extends StatefulWidget {
 }
 
 class _TranslationPageState extends State<TranslationPage> {
+  int currentDialogIndex = 0;
   final Logger _logger = Logger('TranslationPage');
   TextEditingController textEditingController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
@@ -61,8 +68,19 @@ class _TranslationPageState extends State<TranslationPage> {
     });
   }
 
+  void _navigateToDetails() {
+    Navigator.pushNamed(context, '/drawer');
+  }
 
-Future<void> _checkFirstTime() async {
+  void _navigateToDevelopers() {
+    Navigator.pushNamed(context, '/Creator');
+  }
+
+  void _navigateToHome() {
+    Navigator.pushNamed(context, '/');
+  }
+
+  Future<void> _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if the app is run for the first time
@@ -70,26 +88,29 @@ Future<void> _checkFirstTime() async {
 
     if (isFirstTime) {
       // Show the dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Welcome to Translit!'),
-            content: Image.asset('assets/welcome.png'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  // Close the dialog
-                  Navigator.of(context).pop();
-                  // Set isFirstTime to false to prevent showing the dialog again
-                  prefs.setBool('isFirstTime', false);
-                },
-                child: Text('Thanks!'),
-              ),
-            ],
-          );
-        },
-      );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: Text('Welcome to Translit!'),
+      //       content: Image.asset('assets/welcome.png'),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           onPressed: () {
+      //             // Close the dialog
+      //             Navigator.of(context).pop();
+      //             // Set isFirstTime to false to prevent showing the dialog again
+      //             prefs.setBool('isFirstTime', false);
+      //           },
+      //           child: Text('Thanks!'),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
+
+      _showDialogFirst(0);
+      prefs.setBool('isFirstTime', false);
     }
   }
 
@@ -183,7 +204,8 @@ Future<void> _checkFirstTime() async {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('http://192.168.92.146:5000/upload_audio/$TextChoose');
+      var uri =
+          Uri.parse('http://192.168.92.146:5000/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
 
@@ -240,6 +262,95 @@ Future<void> _checkFirstTime() async {
     }
   }
 
+  void _showNextDialog(int currentIndex) {
+    if (currentIndex < 9) {
+      setState(() {
+        currentDialogIndex = currentIndex + 1;
+      });
+      _showDialog(currentDialogIndex);
+    } else {
+      // Handle the last dialog
+      Navigator.of(context).maybePop();
+    }
+  }
+
+  void _showPreviousDialog(int currentIndex) {
+    if (currentIndex > 0) {
+      setState(() {
+        currentDialogIndex = currentIndex - 1;
+      });
+      _showDialog(currentDialogIndex);
+    }
+  }
+
+  void _showDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Image.asset(_getImagePath(index)),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (index > 0)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showPreviousDialog(index);
+                    },
+                    child: Text('Back'),
+                  ),
+                SizedBox(width: 8), // Add some space in the middle
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showNextDialog(index);
+                  },
+                  child: Text('Next'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialogFirst(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Image.asset(_getImagePathFirst(index)),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (index > 0)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showPreviousDialog(index);
+                    },
+                    child: Text('Back'),
+                  ),
+                SizedBox(width: 8), // Add some space in the middle
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showNextDialog(index);
+                  },
+                  child: Text('Next'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _textController
@@ -265,35 +376,38 @@ Future<void> _checkFirstTime() async {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.translate),
         title: const Text('Translation'),
         backgroundColor: Colors.lightBlue.shade800,
         actions: [
           IconButton(
             icon: const Icon(Icons.error_outline),
             onPressed: () {
-               showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('How this Works'),
-            content: Image.asset('assets/howtodo.gif'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  // Close the dialog
-                  Navigator.of(context).pop();
-                  // Set isFirstTime to false to prevent showing the dialog again
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+              _showDialog(0);
             },
           )
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const Padding(padding: EdgeInsets.only(top: 50)),
+            _headerapp(),
+            _buildItem(
+              icon: Icons.translate,
+              title: 'Translate',
+              onTap: _navigateToHome,
+            ),
+            _buildItem(
+                icon: Icons.priority_high,
+                title: 'Details',
+                onTap: _navigateToDetails),
+            _buildItem(
+                icon: Icons.groups,
+                title: 'Developers',
+                onTap: _navigateToDevelopers)
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -444,5 +558,111 @@ Future<void> _checkFirstTime() async {
         ],
       ),
     );
+  }
+}
+
+_headerapp() {
+  return const DrawerHeader(
+    decoration: BoxDecoration(
+      color: Color(0xFF0000FF),
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(20.0),
+        bottomRight: Radius.circular(20.0),
+      ),
+    ),
+    child: Icon(Ionicons.language_outline),
+  );
+}
+
+_buildItem(
+    {required IconData icon,
+    required title,
+    required GestureTapCallback onTap}) {
+  return ListTile(
+    leading: Icon(icon),
+    title: Text(title),
+    onTap: onTap,
+    minLeadingWidth: 5,
+  );
+}
+
+// String _getTitle(int index) {
+//   switch (index) {
+//     case 0:
+//       return '';
+//     case 1:
+//       return '';
+//     case 2:
+//       return '';
+//     case 3:
+//       return '';
+//     case 4:
+//       return '';
+//     case 5:
+//       return '';
+//     case 6:
+//       return '';
+//     case 7:
+//       return '';
+//     case 8:
+//       return '';
+//     case 9:
+//       return '';
+//     default:
+//       return ' ';
+//   }
+// }
+
+String _getImagePath(int index) {
+  switch (index) {
+    case 0:
+      return 'assets/welcome.png';
+    case 1:
+      return 'assets/loc/1.png';
+    case 2:
+      return 'assets/loc/2.png';
+    case 3:
+      return 'assets/loc/3.png';
+    case 4:
+      return 'assets/loc/4.png';
+    case 5:
+      return 'assets/loc/5.png';
+    case 6:
+      return 'assets/loc/6.png';
+    case 7:
+      return 'assets/loc/7.png';
+    case 8:
+      return 'assets/loc/8.png';
+    case 9:
+      return 'assets/loc/9.png';
+    default:
+      return 'assets/welcome.png';
+  }
+}
+
+String _getImagePathFirst(int index) {
+  switch (index) {
+    case 0:
+      return 'assets/welcome.png';
+    case 1:
+      return 'assets/loc/1.png';
+    case 2:
+      return 'assets/loc/2.png';
+    case 3:
+      return 'assets/loc/3.png';
+    case 4:
+      return 'assets/loc/4.png';
+    case 5:
+      return 'assets/loc/5.png';
+    case 6:
+      return 'assets/loc/6.png';
+    case 7:
+      return 'assets/loc/7.png';
+    case 8:
+      return 'assets/loc/8.png';
+    case 9:
+      return 'assets/loc/9.png';
+    default:
+      return 'assets/welcome.png';
   }
 }
