@@ -43,7 +43,7 @@ dependencies:
   permission_handler: ^11.0.0
   logging: ^1.2.0
   record: ^4.4.4
-  awesome_dialog: ^3.1.0
+  
   shared_preferences: ^2.2.2
   ionicons: ^0.2.2
 dev_dependencies:
@@ -68,7 +68,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/
+    - assets/loc/
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
