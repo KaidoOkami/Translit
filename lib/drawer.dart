@@ -75,8 +75,34 @@ class _DetailsState extends State<Details> {
           ],
         ),
       ),
-      body: Center(
-        child: Text("Details Screen Content"),
+       body: Center(
+        child: Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                  10.0)), // Set the elevation (shadow) value
+          child: Container(
+            width:
+                double.infinity, // Set width to take the full available width
+            height: 600,
+            padding: const EdgeInsets.symmetric(
+                horizontal: 20.0), // Adjust the horizontal padding as needed
+            decoration: BoxDecoration(
+              color: Colors.blue, // Set your desired background color
+              borderRadius: BorderRadius.circular(
+                  10.0), // Optionally, set border radius for rounded corners
+            ),
+            child: const Center(
+              child: Text(
+                'Elevated Card',
+                style: TextStyle(
+                  color: Colors
+                      .white, // Set text color to be visible on the background
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

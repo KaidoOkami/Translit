@@ -30,7 +30,6 @@ class Creator extends StatefulWidget {
 }
 
 class _CreatorState extends State<Creator> {
-
   void _navigateToDetails() {
     Navigator.pushNamed(context, '/drawer');
   }
@@ -42,8 +41,6 @@ class _CreatorState extends State<Creator> {
   void _navigateToHome() {
     Navigator.pushNamed(context, '/');
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +71,62 @@ class _CreatorState extends State<Creator> {
         ),
       ),
       body: Center(
-        child: Text('Creator content goes here.'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  'assets/welcome.png', // Replace with your image path
+                  width: 100, // Adjust the width of the image
+                  height: 100, // Adjust the height of the image
+                ),
+                const SizedBox(width: 16), // Add space between image and text
+                Text(
+                  'Your Text Here', // Replace with your text
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            const SizedBox(
+                height: 25), // Add vertical space between the two rows
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const SizedBox(width: 16), // Add space between image and text
+                Text(
+                  'Your Text Here', // Replace with your text
+                  style: TextStyle(fontSize: 18),
+                ),
+                Image.asset(
+                  'assets/welcome.png', // Replace with your image path
+                  width: 100, // Adjust the width of the image
+                  height: 100, // Adjust the height of the image
+                ),
+              ],
+            ),
+            const SizedBox(
+                height: 25), // Add vertical space between the two rows
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(width: 16),
+                Image.asset(
+                  'assets/welcome.png', // Replace with your image path
+                  width: 100, // Adjust the width of the image
+                  height: 100, // Adjust the height of the image
+                ), // Add space between image and text
+                Text(
+                  'Your Text Here', // Replace with your text
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            // Add more widgets below if needed
+          ],
+        ),
       ),
     );
   }
