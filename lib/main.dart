@@ -51,6 +51,7 @@ class _TranslationPageState extends State<TranslationPage> {
   String TextChoose = 'Conyo';
   String resultText = '';
   bool isTranscribed = true;
+  String Url = 'http://192.168.31.29:5000';
   String finalText = '';
   int currentIndex = 0;
   bool isVisible = true;
@@ -184,7 +185,6 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
@@ -606,7 +606,7 @@ class _TranslationPageState extends State<TranslationPage> {
 }
 
 _headerapp() {
-  return  DrawerHeader(
+  return DrawerHeader(
     decoration: const BoxDecoration(
       color: Color.fromARGB(255, 28, 133, 178),
       borderRadius: BorderRadius.only(
@@ -666,23 +666,23 @@ String _getImagePathFirst(int index) {
     case 0:
       return 'assets/welcome.png';
     case 1:
-      return 'assets/loc/1.png';
-    case 2:
       return 'assets/loc/2.png';
+    case 2:
+      return 'assets/loc/1.png';
     case 3:
-      return 'assets/loc/3.png';
-    case 4:
       return 'assets/loc/4.png';
-    case 5:
+    case 4:
       return 'assets/loc/5.png';
-    case 6:
+    case 5:
       return 'assets/loc/6.png';
-    case 7:
+    case 6:
       return 'assets/loc/7.png';
-    case 8:
+    case 7:
       return 'assets/loc/8.png';
-    case 9:
+    case 8:
       return 'assets/loc/9.png';
+    case 9:
+      return 'assets/loc/10.png';
     default:
       return 'assets/welcome.png';
   }
