@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food/drawer.dart';
 import 'package:food/main.dart';
-import 'package:ionicons/ionicons.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -78,50 +78,88 @@ class _CreatorState extends State<Creator> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image.asset(
-                  'assets/welcome.png', // Replace with your image path
-                  width: 100, // Adjust the width of the image
-                  height: 100, // Adjust the height of the image
+                Padding(
+                  padding:
+                      EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
+                  child: Image.asset(
+                    'assets/vars/james.jpg', // Replace with your image path
+                    width: 100, // Adjust the width of the image
+                    height: 100, // Adjust the height of the image
+                  ),
                 ),
                 const SizedBox(width: 16), // Add space between image and text
-                Text(
-                  'Your Text Here', // Replace with your text
-                  style: TextStyle(fontSize: 18),
+                 const Column(
+                  children: <Widget>[
+                    Text(
+                      'James Martin O. Balberan', // Replace with your text
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Developer', // Replace with your text
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(
-                height: 25), // Add vertical space between the two rows
+                height: 60), // Add vertical space between the two rows
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 const SizedBox(width: 16), // Add space between image and text
-                Text(
-                  'Your Text Here', // Replace with your text
-                  style: TextStyle(fontSize: 18),
+                const Column(
+                  children: <Widget>[
+                    Text(
+                      'Benedict B. Dome', // Replace with your text
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Developer', // Replace with your text
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
                 ),
-                Image.asset(
-                  'assets/welcome.png', // Replace with your image path
-                  width: 100, // Adjust the width of the image
-                  height: 100, // Adjust the height of the image
-                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Image.asset(
+                    'assets/vars/ben.jpg', // Replace with your image path
+                    width: 100, // Adjust the width of the image
+                    height: 100, // Adjust the height of the image
+                  ),
+                )
               ],
             ),
             const SizedBox(
-                height: 25), // Add vertical space between the two rows
+                height: 60), // Add vertical space between the two rows
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(width: 16),
-                Image.asset(
-                  'assets/welcome.png', // Replace with your image path
-                  width: 100, // Adjust the width of the image
-                  height: 100, // Adjust the height of the image
-                ), // Add space between image and text
-                Text(
-                  'Your Text Here', // Replace with your text
-                  style: TextStyle(fontSize: 18),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                  ),
+                  child: Image.asset(
+                    'assets/vars/rachel.jpg', // Replace with your image path
+                    width: 100, // Adjust the width of the image
+                    height: 100, // Adjust the height of the image
+                  ),
                 ),
+                const SizedBox(width: 16), // Add space between image and text
+                const Column(
+                  children: <Widget>[
+                    Text(
+                      'Rachelle Mae Cabiling', // Replace with your text
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Developer', // Replace with your text
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                )
               ],
             ),
             // Add more widgets below if needed
@@ -133,16 +171,19 @@ class _CreatorState extends State<Creator> {
 }
 
 _headerapp() {
-  return const DrawerHeader(
-    decoration: BoxDecoration(
-      color: Color(0xFF0000FF),
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20.0),
-        bottomRight: Radius.circular(20.0),
+  return DrawerHeader(
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 28, 133, 178),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20.0),
+          bottomRight: Radius.circular(20.0),
+        ),
       ),
-    ),
-    child: Icon(Ionicons.language_outline),
-  );
+      child: SizedBox(
+        width: 150,
+        height: 200,
+        child: Image.asset('assets/vars/icon.png'),
+      ));
 }
 
 _buildItem(

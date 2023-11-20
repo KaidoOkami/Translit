@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'drawer.dart';
 import 'creator.dart';
+import 'dart:ui' as ui;
 
 void main() {
   runApp(MyApp());
@@ -54,6 +55,7 @@ class _TranslationPageState extends State<TranslationPage> {
   String finalText = '';
   int currentIndex = 0;
   bool isVisible = true;
+  double _fontSize = 40.0;
   bool isRecording = false;
   late FlutterSoundRecorder _audioRecorder;
 
@@ -110,11 +112,11 @@ class _TranslationPageState extends State<TranslationPage> {
       Permission.microphone,
       Permission.storage,
     ].request();
+
     if (statuses[Permission.microphone]!.isGranted &&
         statuses[Permission.storage]!.isGranted) {
       // Permissions granted
-    } else if (statuses[Permission.microphone]!.isDenied ||
-        statuses[Permission.storage]!.isDenied) {
+    } else if (statuses[Permission.microphone]!.isDenied) {
       _showPermissionDeniedDialog();
     } else if (statuses[Permission.microphone]!.isPermanentlyDenied ||
         statuses[Permission.storage]!.isPermanentlyDenied) {
@@ -341,6 +343,51 @@ class _TranslationPageState extends State<TranslationPage> {
     super.dispose();
   }
 
+  Map<String, dynamic> _calculatePaddingre() {
+    const double initialFontSize = 40.0;
+    const double fontSizePerLine = 5.0;
+    const double minFontSize = 16.0;
+
+    String text = isTranscribed ? transcribedText ?? "" : enteredText ?? "";
+
+    // Check if the text is not empty
+
+    // Create a TextPainter to measure the text layout
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(
+          fontSize:
+              initialFontSize, // Use the initial font size for measurement
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+      maxLines: 3, // Set max lines to your desired value
+    );
+
+    textPainter.layout(
+        maxWidth:
+            400); // Specify the maximum width of your TextField (1 is just a placeholder)
+
+    // Calculate the number of lines based on the visual layout
+    int numberOfVisualLines = textPainter.computeLineMetrics().length;
+    print(numberOfVisualLines);
+    // Calculate the font size based on the number of visual lines
+    double calculatedFontSize =
+        initialFontSize - fontSizePerLine * (numberOfVisualLines - 1);
+    print(calculatedFontSize);
+    calculatedFontSize = calculatedFontSize.clamp(minFontSize, initialFontSize);
+    return {'fontSize': calculatedFontSize};
+
+    // If the text is empty, return the initial font size
+  }
+
+  void _updateFontSize() {
+    setState(() {
+      _fontSize = _calculatePaddingre()['fontSize'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     bool showfab = MediaQuery.of(context).viewInsets.bottom != 0;
@@ -406,52 +453,69 @@ class _TranslationPageState extends State<TranslationPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 25, left: 10),
-                    child: TextField(
-                      controller: TextEditingController(
-                          text: isTranscribed ? transcribedText : enteredText),
-                      onChanged: (text) {
-                        if (_timer != null && _timer!.isActive) {
-                          _timer!.cancel(); // Cancel the previous timer
-                        }
-                        _timer = Timer(const Duration(milliseconds: 2500), () {
-                          setState(() {
-                            setState(() {
-                              enteredText = text;
-                              isTranscribed = !text.isEmpty;
-                              // Switch to enteredText when the user starts typing
-                            });
-                            sendTextToServer(enteredText);
-                            print(
-                                enteredText); // Capture the text after a delay
-                          });
-                        });
+                      padding: const EdgeInsets.only(top: 25, left: 10),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 3,
+                              style: TextStyle(
+                                fontSize: _fontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              controller: TextEditingController(
+                                  text: isTranscribed
+                                      ? transcribedText
+                                      : enteredText),
+                              onChanged: (text) {
+                                if (_timer != null && _timer!.isActive) {
+                                  _timer!.cancel(); // Cancel the previous timer
+                                }
+                                _timer = Timer(
+                                    const Duration(milliseconds: 800), () {
+                                  setState(() {
+                                    setState(() {
+                                      enteredText = text;
+                                      isTranscribed = !text.isEmpty;
+                                      _updateFontSize();
+                                      // Switch to enteredText when the user starts typing
+                                    });
+                                    sendTextToServer(enteredText);
+                                    print(
+                                        enteredText); // Capture the text after a delay
+                                  });
+                                });
 
-                        // You can use enteredText to send to the server
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Text',
-                        border: OutlineInputBorder(),
-                      ),
-                      style: const TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                       minLines: 1, // Set the minimum number of lines
-                       maxLines: 5, // Set the maximum number of lines
-                    ),
-                  ),
-                
+                                // You can use enteredText to send to the server
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Enter Text',
+                                border: InputBorder.none,
+                                isDense: true,
+                              ),
+                            ),
+                          )
+                        ],
+                      )),
                   Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Align(
                           alignment: Alignment.bottomLeft,
                           child: Opacity(
                             opacity: 0.5,
-                            child: Text(resultText,
-                                style: const TextStyle(
-                                    fontSize: 40,
+                            child: Text(
+                                enteredText.isNotEmpty
+                                    ? (MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom >
+                                            0
+                                        ? 'Translating...'
+                                        : (resultText ?? ''))
+                                    : '',
+                                style: TextStyle(
+                                    fontSize: _calculatePaddingre()['fontSize'],
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold)),
                           ))),
@@ -490,7 +554,7 @@ class _TranslationPageState extends State<TranslationPage> {
                         );
                       },
                     ).then((value) {
-                      if (value != null) {
+                      if (value != null ) {
                         setState(() {
                           TextChoose = value;
                           print('Press : ' + TextChoose);
@@ -542,20 +606,19 @@ class _TranslationPageState extends State<TranslationPage> {
 }
 
 _headerapp() {
-  return  DrawerHeader(
-    decoration: const BoxDecoration(
-      color: Color.fromARGB(255, 28, 133, 178),
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20.0),
-        bottomRight: Radius.circular(20.0),
+  return DrawerHeader(
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 28, 133, 178),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20.0),
+          bottomRight: Radius.circular(20.0),
+        ),
       ),
-    ),
-    child: SizedBox(
-      width: 100,
-      height: 100,
-      child: Image.asset('assets/welcome.png'),
-    ),
-  );
+      child: SizedBox(
+        width: 150,
+        height: 200,
+        child: Image.asset('assets/vars/icon.png'),
+      ));
 }
 
 _buildItem(
@@ -591,35 +654,35 @@ String _getImagePath(int index) {
     case 8:
       return 'assets/loc/9.png';
     case 9:
-      return 'assets/welcome.png';
+      return 'assets/loc/10.png';
     default:
-      return 'assets/welcome.png';
-  }-
+      return 'assets/vars/welcome.png';
+  }
 }
 
 String _getImagePathFirst(int index) {
   switch (index) {
     case 0:
-      return 'assets/welcome.png';
+      return 'assets/vars/welcome.png';
     case 1:
-      return 'assets/loc/1.png';
-    case 2:
       return 'assets/loc/2.png';
+    case 2:
+      return 'assets/loc/1.png';
     case 3:
-      return 'assets/loc/3.png';
-    case 4:
       return 'assets/loc/4.png';
-    case 5:
+    case 4:
       return 'assets/loc/5.png';
-    case 6:
+    case 5:
       return 'assets/loc/6.png';
-    case 7:
+    case 6:
       return 'assets/loc/7.png';
-    case 8:
+    case 7:
       return 'assets/loc/8.png';
-    case 9:
+    case 8:
       return 'assets/loc/9.png';
+    case 9:
+      return 'assets/loc/10.png';
     default:
-      return 'assets/welcome.png';
+      return 'assets/vars/welcome.png';
   }
 }
