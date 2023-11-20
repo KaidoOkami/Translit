@@ -88,28 +88,6 @@ class _TranslationPageState extends State<TranslationPage> {
     bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
     if (isFirstTime) {
-      // Show the dialog
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       title: Text('Welcome to Translit!'),
-      //       content: Image.asset('assets/welcome.png'),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           onPressed: () {
-      //             // Close the dialog
-      //             Navigator.of(context).pop();
-      //             // Set isFirstTime to false to prevent showing the dialog again
-      //             prefs.setBool('isFirstTime', false);
-      //           },
-      //           child: Text('Thanks!'),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
-
       _showDialogFirst(0);
       prefs.setBool('isFirstTime', false);
     }
@@ -415,7 +393,7 @@ class _TranslationPageState extends State<TranslationPage> {
             decoration: const BoxDecoration(color: Colors.white10),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(
               height: 400,
               decoration: BoxDecoration(
@@ -453,16 +431,18 @@ class _TranslationPageState extends State<TranslationPage> {
                       },
                       decoration: const InputDecoration(
                         hintText: 'Enter Text',
-                        border: InputBorder.none,
+                        border: OutlineInputBorder(),
                       ),
                       style: const TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
-                      maxLines: 2,
+                       minLines: 1, // Set the minimum number of lines
+                       maxLines: 5, // Set the maximum number of lines
                     ),
                   ),
+                
                   Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Align(
@@ -562,15 +542,19 @@ class _TranslationPageState extends State<TranslationPage> {
 }
 
 _headerapp() {
-  return const DrawerHeader(
-    decoration: BoxDecoration(
+  return  DrawerHeader(
+    decoration: const BoxDecoration(
       color: Color.fromARGB(255, 28, 133, 178),
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(20.0),
         bottomRight: Radius.circular(20.0),
       ),
     ),
-    child: Icon(Ionicons.language_outline),
+    child: SizedBox(
+      width: 100,
+      height: 100,
+      child: Image.asset('assets/welcome.png'),
+    ),
   );
 }
 
@@ -610,7 +594,7 @@ String _getImagePath(int index) {
       return 'assets/welcome.png';
     default:
       return 'assets/welcome.png';
-  }
+  }-
 }
 
 String _getImagePathFirst(int index) {
