@@ -554,7 +554,7 @@ class _TranslationPageState extends State<TranslationPage> {
                         );
                       },
                     ).then((value) {
-                      if (value != null) {
+                      if (value != null ) {
                         setState(() {
                           TextChoose = value;
                           print('Press : ' + TextChoose);
