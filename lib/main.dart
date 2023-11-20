@@ -49,6 +49,7 @@ class _TranslationPageState extends State<TranslationPage> {
   String? transcribedText = '';
   String TextChoose = 'Conyo';
   String resultText = '';
+  String Url = 'http://192.168.92.146:5000';
   bool isTranscribed = true;
   String finalText = '';
   int currentIndex = 0;
@@ -87,28 +88,6 @@ class _TranslationPageState extends State<TranslationPage> {
     bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
     if (isFirstTime) {
-      // Show the dialog
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       title: Text('Welcome to Translit!'),
-      //       content: Image.asset('assets/welcome.png'),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           onPressed: () {
-      //             // Close the dialog
-      //             Navigator.of(context).pop();
-      //             // Set isFirstTime to false to prevent showing the dialog again
-      //             prefs.setBool('isFirstTime', false);
-      //           },
-      //           child: Text('Thanks!'),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
-
       _showDialogFirst(0);
       prefs.setBool('isFirstTime', false);
     }
@@ -204,7 +183,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_audio/$TextChoose');
+      var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
 
@@ -233,7 +212,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       // Replace the URL with your server endpoint
       // ignore: prefer_interpolation_to_compose_strings
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_text/$TextChoose');
+      var uri = Uri.parse('$Url/upload_text/$TextChoose');
 
       var request = http.MultipartRequest('POST', uri)
         ..fields['text'] =
@@ -414,7 +393,7 @@ class _TranslationPageState extends State<TranslationPage> {
             decoration: const BoxDecoration(color: Colors.white10),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(
               height: 400,
               decoration: BoxDecoration(
@@ -435,7 +414,7 @@ class _TranslationPageState extends State<TranslationPage> {
                         if (_timer != null && _timer!.isActive) {
                           _timer!.cancel(); // Cancel the previous timer
                         }
-                        _timer = Timer(const Duration(milliseconds: 800), () {
+                        _timer = Timer(const Duration(milliseconds: 2500), () {
                           setState(() {
                             setState(() {
                               enteredText = text;
@@ -452,16 +431,18 @@ class _TranslationPageState extends State<TranslationPage> {
                       },
                       decoration: const InputDecoration(
                         hintText: 'Enter Text',
-                        border: InputBorder.none,
+                        border: OutlineInputBorder(),
                       ),
                       style: const TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
-                      maxLines: 2,
+                       minLines: 1, // Set the minimum number of lines
+                       maxLines: 5, // Set the maximum number of lines
                     ),
                   ),
+                
                   Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Align(
@@ -561,15 +542,19 @@ class _TranslationPageState extends State<TranslationPage> {
 }
 
 _headerapp() {
-  return const DrawerHeader(
-    decoration: BoxDecoration(
-      color: Color(0xFF0000FF),
+  return  DrawerHeader(
+    decoration: const BoxDecoration(
+      color: Color.fromARGB(255, 28, 133, 178),
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(20.0),
         bottomRight: Radius.circular(20.0),
       ),
     ),
-    child: Icon(Ionicons.language_outline),
+    child: SizedBox(
+      width: 100,
+      height: 100,
+      child: Image.asset('assets/welcome.png'),
+    ),
   );
 }
 
@@ -609,7 +594,7 @@ String _getImagePath(int index) {
       return 'assets/welcome.png';
     default:
       return 'assets/welcome.png';
-  }
+  }-
 }
 
 String _getImagePathFirst(int index) {
