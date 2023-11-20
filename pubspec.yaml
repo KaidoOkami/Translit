@@ -46,6 +46,8 @@ dependencies:
   
   shared_preferences: ^2.2.2
   ionicons: ^0.2.2
+  auto_size_text: ^3.0.0
+  auto_size_text_field: ^2.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'drawer.dart';
 import 'creator.dart';
+import 'dart:ui' as ui;
 
 void main() {
   runApp(MyApp());
@@ -49,10 +50,12 @@ class _TranslationPageState extends State<TranslationPage> {
   String? transcribedText = '';
   String TextChoose = 'Conyo';
   String resultText = '';
+  String Url = 'http://192.168.31.29:5000';
   bool isTranscribed = true;
   String finalText = '';
   int currentIndex = 0;
   bool isVisible = true;
+  double _fontSize = 40.0;
   bool isRecording = false;
   late FlutterSoundRecorder _audioRecorder;
 
@@ -87,28 +90,6 @@ class _TranslationPageState extends State<TranslationPage> {
     bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
     if (isFirstTime) {
-      // Show the dialog
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       title: Text('Welcome to Translit!'),
-      //       content: Image.asset('assets/welcome.png'),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           onPressed: () {
-      //             // Close the dialog
-      //             Navigator.of(context).pop();
-      //             // Set isFirstTime to false to prevent showing the dialog again
-      //             prefs.setBool('isFirstTime', false);
-      //           },
-      //           child: Text('Thanks!'),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
-
       _showDialogFirst(0);
       prefs.setBool('isFirstTime', false);
     }
@@ -204,7 +185,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_audio/$TextChoose');
+      var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
 
@@ -233,7 +214,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       // Replace the URL with your server endpoint
       // ignore: prefer_interpolation_to_compose_strings
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_text/$TextChoose');
+      var uri = Uri.parse('$Url/upload_text/$TextChoose');
 
       var request = http.MultipartRequest('POST', uri)
         ..fields['text'] =
@@ -362,6 +343,51 @@ class _TranslationPageState extends State<TranslationPage> {
     super.dispose();
   }
 
+  Map<String, dynamic> _calculatePaddingre() {
+    const double initialFontSize = 40.0;
+    const double fontSizePerLine = 5.0;
+    const double minFontSize = 16.0;
+
+    String text = isTranscribed ? transcribedText ?? "" : enteredText ?? "";
+
+    // Check if the text is not empty
+
+    // Create a TextPainter to measure the text layout
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(
+          fontSize:
+              initialFontSize, // Use the initial font size for measurement
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+      maxLines: 3, // Set max lines to your desired value
+    );
+
+    textPainter.layout(
+        maxWidth:
+            400); // Specify the maximum width of your TextField (1 is just a placeholder)
+
+    // Calculate the number of lines based on the visual layout
+    int numberOfVisualLines = textPainter.computeLineMetrics().length;
+    print(numberOfVisualLines);
+    // Calculate the font size based on the number of visual lines
+    double calculatedFontSize =
+        initialFontSize - fontSizePerLine * (numberOfVisualLines - 1);
+    print(calculatedFontSize);
+    calculatedFontSize = calculatedFontSize.clamp(minFontSize, initialFontSize);
+    return {'fontSize': calculatedFontSize};
+
+    // If the text is empty, return the initial font size
+  }
+
+  void _updateFontSize() {
+    setState(() {
+      _fontSize = _calculatePaddingre()['fontSize'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     bool showfab = MediaQuery.of(context).viewInsets.bottom != 0;
@@ -427,50 +453,69 @@ class _TranslationPageState extends State<TranslationPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 25, left: 10),
-                    child: TextField(
-                      controller: TextEditingController(
-                          text: isTranscribed ? transcribedText : enteredText),
-                      onChanged: (text) {
-                        if (_timer != null && _timer!.isActive) {
-                          _timer!.cancel(); // Cancel the previous timer
-                        }
-                        _timer = Timer(const Duration(milliseconds: 800), () {
-                          setState(() {
-                            setState(() {
-                              enteredText = text;
-                              isTranscribed = !text.isEmpty;
-                              // Switch to enteredText when the user starts typing
-                            });
-                            sendTextToServer(enteredText);
-                            print(
-                                enteredText); // Capture the text after a delay
-                          });
-                        });
+                      padding: const EdgeInsets.only(top: 25, left: 10),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 3,
+                              style: TextStyle(
+                                fontSize: _fontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              controller: TextEditingController(
+                                  text: isTranscribed
+                                      ? transcribedText
+                                      : enteredText),
+                              onChanged: (text) {
+                                if (_timer != null && _timer!.isActive) {
+                                  _timer!.cancel(); // Cancel the previous timer
+                                }
+                                _timer = Timer(
+                                    const Duration(milliseconds: 800), () {
+                                  setState(() {
+                                    setState(() {
+                                      enteredText = text;
+                                      isTranscribed = !text.isEmpty;
+                                      _updateFontSize();
+                                      // Switch to enteredText when the user starts typing
+                                    });
+                                    sendTextToServer(enteredText);
+                                    print(
+                                        enteredText); // Capture the text after a delay
+                                  });
+                                });
 
-                        // You can use enteredText to send to the server
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Text',
-                        border: InputBorder.none,
-                      ),
-                      style: const TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      maxLines: 2,
-                    ),
-                  ),
+                                // You can use enteredText to send to the server
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Enter Text',
+                                border: InputBorder.none,
+                                isDense: true,
+                              ),
+                            ),
+                          )
+                        ],
+                      )),
                   Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Align(
                           alignment: Alignment.bottomLeft,
                           child: Opacity(
                             opacity: 0.5,
-                            child: Text(resultText,
-                                style: const TextStyle(
-                                    fontSize: 40,
+                            child: Text(
+                                enteredText.isNotEmpty
+                                    ? (MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom >
+                                            0
+                                        ? 'Translating...'
+                                        : (resultText ?? ''))
+                                    : '',
+                                style: TextStyle(
+                                    fontSize: _calculatePaddingre()['fontSize'],
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold)),
                           ))),
