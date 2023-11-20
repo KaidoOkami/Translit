@@ -49,6 +49,7 @@ class _TranslationPageState extends State<TranslationPage> {
   String? transcribedText = '';
   String TextChoose = 'Conyo';
   String resultText = '';
+  String Url = 'http://192.168.92.146:5000';
   bool isTranscribed = true;
   String finalText = '';
   int currentIndex = 0;
@@ -204,7 +205,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_audio/$TextChoose');
+      var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
 
@@ -233,7 +234,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       // Replace the URL with your server endpoint
       // ignore: prefer_interpolation_to_compose_strings
-      var uri = Uri.parse('http://192.168.31.29:5000/upload_text/$TextChoose');
+      var uri = Uri.parse('$Url/upload_text/$TextChoose');
 
       var request = http.MultipartRequest('POST', uri)
         ..fields['text'] =
@@ -435,7 +436,7 @@ class _TranslationPageState extends State<TranslationPage> {
                         if (_timer != null && _timer!.isActive) {
                           _timer!.cancel(); // Cancel the previous timer
                         }
-                        _timer = Timer(const Duration(milliseconds: 800), () {
+                        _timer = Timer(const Duration(milliseconds: 2500), () {
                           setState(() {
                             setState(() {
                               enteredText = text;
@@ -563,7 +564,7 @@ class _TranslationPageState extends State<TranslationPage> {
 _headerapp() {
   return const DrawerHeader(
     decoration: BoxDecoration(
-      color: Color(0xFF0000FF),
+      color: Color.fromARGB(255, 28, 133, 178),
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(20.0),
         bottomRight: Radius.circular(20.0),
