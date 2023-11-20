@@ -83,17 +83,18 @@ class _TranslationPageState extends State<TranslationPage> {
     Navigator.pushNamed(context, '/');
   }
 
-  Future<void> _checkFirstTime() async {
+Future<void> _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if the app is run for the first time
-    bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    bool? isFirstTime = prefs.getBool('isFirstTime');
 
-    if (isFirstTime) {
+    if (isFirstTime == null || isFirstTime) {
       _showDialogFirst(0);
       prefs.setBool('isFirstTime', false);
     }
   }
+
 
   void checkKeyboardVisibility() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -250,7 +251,8 @@ class _TranslationPageState extends State<TranslationPage> {
       _showDialog(currentDialogIndex);
     } else {
       // Handle the last dialog
-      Navigator.of(context).maybePop();
+      Navigator.of(context).maybePop(); // Close the dialog
+      _navigateToHome(); // Navigate to home page
     }
   }
 
