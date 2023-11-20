@@ -52,7 +52,6 @@ class _TranslationPageState extends State<TranslationPage> {
   String resultText = '';
   String Url = 'http://192.168.92.146:5000';
   bool isTranscribed = true;
-  String Url = 'http://192.168.31.29:5000';
   String finalText = '';
   int currentIndex = 0;
   bool isVisible = true;
