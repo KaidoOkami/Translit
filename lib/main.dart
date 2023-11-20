@@ -112,11 +112,11 @@ class _TranslationPageState extends State<TranslationPage> {
       Permission.microphone,
       Permission.storage,
     ].request();
+
     if (statuses[Permission.microphone]!.isGranted &&
         statuses[Permission.storage]!.isGranted) {
       // Permissions granted
-    } else if (statuses[Permission.microphone]!.isDenied ||
-        statuses[Permission.storage]!.isDenied) {
+    } else if (statuses[Permission.microphone]!.isDenied) {
       _showPermissionDeniedDialog();
     } else if (statuses[Permission.microphone]!.isPermanentlyDenied ||
         statuses[Permission.storage]!.isPermanentlyDenied) {
@@ -607,19 +607,18 @@ class _TranslationPageState extends State<TranslationPage> {
 
 _headerapp() {
   return DrawerHeader(
-    decoration: const BoxDecoration(
-      color: Color.fromARGB(255, 28, 133, 178),
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20.0),
-        bottomRight: Radius.circular(20.0),
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 28, 133, 178),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20.0),
+          bottomRight: Radius.circular(20.0),
+        ),
       ),
-    ),
-    child: SizedBox(
-      width: 100,
-      height: 100,
-      child: Image.asset('assets/welcome.png'),
-    ),
-  );
+      child: SizedBox(
+        width: 150,
+        height: 200,
+        child: Image.asset('assets/vars/icon.png'),
+      ));
 }
 
 _buildItem(
@@ -655,16 +654,16 @@ String _getImagePath(int index) {
     case 8:
       return 'assets/loc/9.png';
     case 9:
-      return 'assets/welcome.png';
+      return 'assets/loc/10.png';
     default:
-      return 'assets/welcome.png';
+      return 'assets/vars/welcome.png';
   }
 }
 
 String _getImagePathFirst(int index) {
   switch (index) {
     case 0:
-      return 'assets/welcome.png';
+      return 'assets/vars/welcome.png';
     case 1:
       return 'assets/loc/2.png';
     case 2:
@@ -684,6 +683,6 @@ String _getImagePathFirst(int index) {
     case 9:
       return 'assets/loc/10.png';
     default:
-      return 'assets/welcome.png';
+      return 'assets/vars/welcome.png';
   }
 }
