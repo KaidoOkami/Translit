@@ -50,7 +50,6 @@ class _TranslationPageState extends State<TranslationPage> {
   String? transcribedText = '';
   String TextChoose = 'Conyo';
   String resultText = '';
-  String Url = 'http://192.168.31.29:5000';
   bool isTranscribed = true;
   String finalText = '';
   int currentIndex = 0;
@@ -185,6 +184,7 @@ class _TranslationPageState extends State<TranslationPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
+      var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var uri = Uri.parse('$Url/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
@@ -440,7 +440,7 @@ class _TranslationPageState extends State<TranslationPage> {
             decoration: const BoxDecoration(color: Colors.white10),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(
               height: 400,
               decoration: BoxDecoration(
@@ -606,15 +606,19 @@ class _TranslationPageState extends State<TranslationPage> {
 }
 
 _headerapp() {
-  return const DrawerHeader(
-    decoration: BoxDecoration(
-      color: Color(0xFF0000FF),
+  return  DrawerHeader(
+    decoration: const BoxDecoration(
+      color: Color.fromARGB(255, 28, 133, 178),
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(20.0),
         bottomRight: Radius.circular(20.0),
       ),
     ),
-    child: Icon(Ionicons.language_outline),
+    child: SizedBox(
+      width: 100,
+      height: 100,
+      child: Image.asset('assets/welcome.png'),
+    ),
   );
 }
 
