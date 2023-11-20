@@ -61,8 +61,7 @@ class _TranslationPageState extends State<TranslationPage> {
     });
   }
 
-
-Future<void> _checkFirstTime() async {
+  Future<void> _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Check if the app is run for the first time
@@ -183,7 +182,8 @@ Future<void> _checkFirstTime() async {
     try {
       final tempDir = await getTemporaryDirectory();
       final recordingPath = '${tempDir.path}/my_audio.wav';
-      var uri = Uri.parse('http://192.168.92.146:5000/upload_audio/$TextChoose');
+      var uri =
+          Uri.parse('http://192.168.92.146:5000/upload_audio/$TextChoose');
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath('audio', recordingPath));
 
@@ -272,25 +272,25 @@ Future<void> _checkFirstTime() async {
           IconButton(
             icon: const Icon(Icons.error_outline),
             onPressed: () {
-               showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('How this Works'),
-            content: Image.asset('assets/howtodo.gif'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  // Close the dialog
-                  Navigator.of(context).pop();
-                  // Set isFirstTime to false to prevent showing the dialog again
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('How this Works'),
+                    content: Image.asset('assets/howtodo.gif'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          // Close the dialog
+                          Navigator.of(context).pop();
+                          // Set isFirstTime to false to prevent showing the dialog again
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
                 },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+              );
             },
           )
         ],
