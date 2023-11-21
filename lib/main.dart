@@ -63,9 +63,9 @@ class _TranslationPageState extends State<TranslationPage> {
   void initState() {
     super.initState();
     _checkFirstTime();
+     requestPermissions();
     _audioRecorder = FlutterSoundRecorder();
     _audioRecorder.openRecorder();
-    requestPermissions();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkKeyboardVisibility();
     });
